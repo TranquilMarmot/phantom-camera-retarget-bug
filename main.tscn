@@ -1,0 +1,107 @@
+[gd_scene load_steps=14 format=3 uid="uid://dwdlqjrpijnqq"]
+
+[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="1_r5j0t"]
+[ext_resource type="Script" path="res://node_a.gd" id="2_00w22"]
+[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="3_htr3c"]
+[ext_resource type="Script" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="4_b4jlq"]
+[ext_resource type="Script" path="res://node_b.gd" id="5_kyajs"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_joc5y"]
+size = Vector2(100, 100)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jurtj"]
+albedo_color = Color(0.207843, 0, 0, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_h67tv"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_k6eb6"]
+
+[sub_resource type="Resource" id="Resource_nckt6"]
+script = ExtResource("4_b4jlq")
+duration = 1.0
+transition = 0
+ease = 2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_u0phy"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5gws5"]
+size = Vector3(3, 1, 5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wwos4"]
+size = Vector3(3, 1, 5)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, -1.9804, 5.87711, 2.37711)
+
+[node name="PhantomCameraHost" type="Node" parent="Camera3D"]
+process_priority = 300
+process_physics_priority = 300
+script = ExtResource("1_r5j0t")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("PlaneMesh_joc5y")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_jurtj")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_h67tv")
+
+[node name="NodeA" type="RigidBody3D" parent="." node_paths=PackedStringArray("node_b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9804, 1, 0)
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+script = ExtResource("2_00w22")
+node_b = NodePath("../NodeB")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NodeA"]
+shape = SubResource("CapsuleShape3D_k6eb6")
+
+[node name="PhantomCamera3D" type="Node3D" parent="NodeA" node_paths=PackedStringArray("follow_target")]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 4.87711, 2.37711)
+script = ExtResource("3_htr3c")
+follow_mode = 6
+follow_target = NodePath("../MeshInstance3D")
+tween_resource = SubResource("Resource_nckt6")
+follow_offset = Vector3(0, 4.17, 1.67)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NodeA"]
+mesh = SubResource("CapsuleMesh_u0phy")
+
+[node name="NodeB" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 0)
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+mass = 5.0
+script = ExtResource("5_kyajs")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NodeB"]
+shape = SubResource("BoxShape3D_5gws5")
+
+[node name="PhantomCamera3D" type="Node3D" parent="NodeB" node_paths=PackedStringArray("follow_target")]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 8.54711, 7.72711)
+script = ExtResource("3_htr3c")
+follow_mode = 6
+follow_target = NodePath("../MeshInstance3D")
+tween_resource = SubResource("Resource_nckt6")
+follow_offset = Vector3(0, 7.84, 7.02)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NodeB"]
+mesh = SubResource("BoxMesh_wwos4")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.235023, 0.97199, 0, -0.97199, 0.235023, 0, 8.81828, 5.57593)
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.439234, 0.898373, 0, -0.898373, 0.439234, -1.16618, 2.41306, -1.11686)
+text = "Arrows to move
+\"Enter\" to enter/exit car
+\"Escape\" to quit"
+font_size = 128
